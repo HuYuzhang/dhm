@@ -2277,8 +2277,14 @@ TEncSearch::estIntraPredLumaQT(TComDataCU* pcCU,
       distParam.bApplyWeight = false;
       for( Int modeIdx = 0; modeIdx < numModesAvailable; modeIdx++ )
       {
+        // 一个疑问在于，为什么需要用uiMode来临时保存modeIdx呢？试着看一下之后两个变量的用法有没有哪里是不一样的。
+        // 基本上扫了一便，只是十分无聊的拷贝而以，并没有出现诸如修改某个值，所以需要备份初始值这种现象的出现
         UInt       uiMode = modeIdx;
         Distortion uiSad  = 0;
+        // 对于使用deep进行预测的部分，应该主要就在这里了
+        // 根据老司机的说法，这里因为已经看到了，需要使用DEEP，因此我们就
+        // 不需要进行之后的模式上的遍历了。于是下面的break干的就是这一件事情
+        // 虽然感觉理论上也是可以用break直接替代调的？
 #ifdef DEEPRDO
         Bool useDNN = pcCU->getUseDNNFlag(uiAbsPartIdx);
         if (pcCU->getUseDNNFlag(uiAbsPartIdx))

@@ -733,7 +733,24 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 #endif
           }
         }
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//
+//
+//
+//
+//                   My change on HM will begin Here from Dec 20, 2018. Come on!
+//
+//
+//
+//
+//
+//
+//
+//
+/////////////////////////////////////////////////////////////////////////////////
         // do normal intra modes
         // speedup for inter frames
         if ((rpcBestCU->getSlice()->getSliceType() == I_SLICE)                                        ||
@@ -754,6 +771,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
             rpcTempCU->initEstData(uiDepth, iQP, bIsLosslessMode);
             rpcTempCU->setUseDNNFlagSubParts(0, 0, uiDepth);
 #ifndef ONLY8X8
+            // 这里是先尝试整体作DEEP
             rpcTempCU->setUseDNNFlagSubParts(1, 0, uiDepth);
             xCheckRDCostIntra(rpcBestCU, rpcTempCU, SIZE_2Nx2N DEBUG_STRING_PASS_INTO(sDebug));
             /***************************************************************/

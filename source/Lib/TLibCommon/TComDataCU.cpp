@@ -1698,6 +1698,8 @@ Void TComDataCU::setUseDNNFlagSubParts(Bool flag, UInt absPartIdx, UInt depth)
 {
   const UInt numPart = m_pcPic->getNumPartitionsInCtu() >> (depth << 1);
   memset(c_use_dnn + absPartIdx, flag, numPart);
+  // 由于会有很多块，所以需要指定究竟设置多少个最小块。
+  // 另外，absIdx应该是当前的子块的idx吧？
 }
 #endif
 

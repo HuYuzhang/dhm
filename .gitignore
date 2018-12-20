@@ -1,0 +1,10 @@
+bin/*
+lib/*
+tests/*
+t2/*
+t3/*
+source/tags
+cscope*
+*.o
+*.P
+source/.tags*
