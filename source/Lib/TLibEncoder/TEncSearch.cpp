@@ -2234,6 +2234,7 @@ TEncSearch::estIntraPredLumaQT(TComDataCU* pcCU,
   }
 
   //===== loop over partitions =====
+  // 就，按照书上的说法，帧内预测虽然是基于PU的，但是实际操作起来是根据TU来进行的。TU是小于PU的
   TComTURecurse tuRecurseCU(pcCU, 0);
   TComTURecurse tuRecurseWithPU(tuRecurseCU, false, (uiInitTrDepth==0)?TComTU::DONT_SPLIT : TComTU::QUAD_SPLIT);
 
@@ -2285,6 +2286,8 @@ TEncSearch::estIntraPredLumaQT(TComDataCU* pcCU,
         // 根据老司机的说法，这里因为已经看到了，需要使用DEEP，因此我们就
         // 不需要进行之后的模式上的遍历了。于是下面的break干的就是这一件事情
         // 虽然感觉理论上也是可以用break直接替代调的？
+
+        // 感觉意思就是，如果flag设置成了1，那么其实这个函数的工作就已经完成了。这个函数毕竟是为了找最佳的预测模式的？
 #ifdef DEEPRDO
         Bool useDNN = pcCU->getUseDNNFlag(uiAbsPartIdx);
         if (pcCU->getUseDNNFlag(uiAbsPartIdx))
@@ -2293,6 +2296,7 @@ TEncSearch::estIntraPredLumaQT(TComDataCU* pcCU,
           numModesForFullRD = 1;
           if (modeIdx != 0)
           {
+            // emmm解决了昨天的问题，也就是为什么需要在这里使用breaj，因为我们必须保证循环体至少执行一次。为啥？因为循环体中接下来的部分就是对于预测像素的生成了，直接break就不能获得预测像素的值了。
             continue;
           }
         }

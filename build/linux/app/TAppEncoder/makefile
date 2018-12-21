@@ -37,7 +37,7 @@ OBJS          		= 	\
 					$(OBJ_DIR)/TAppEncTop.o \
 
 # set libs to link with
-LIBS				= /home/huzi/libtensorflow/lib/libtensorflow.so /home/huzi/libtensorflow/lib/libtensorflow_framework.so
+LIBS				= /home/struct/lab/intra/libtensorflow/lib/libtensorflow.so /home/struct/lab/intra/libtensorflow/lib/libtensorflow_framework.so
 
 DEBUG_LIBS			=  
 RELEASE_LIBS		=

@@ -228,6 +228,7 @@ Pel TComPrediction::predIntraGetPredValDC( const Pel* pSrc, Int iSrcStride, UInt
  * from the extended main reference.
  */
 //NOTE: Bit-Limit - 25-bit source
+// 哎，命名是真的坑，这个函数才是真正进行angle方式的预测的，而下面那个函数则是将35种模式一并包含在内了
 Void TComPrediction::xPredIntraAng(       Int bitDepth,
                                     const Pel* pSrc,     Int srcStride,
                                           Pel* pTrueDst, Int dstStrideTrue,
@@ -389,6 +390,10 @@ Void TComPrediction::xPredIntraAng(       Int bitDepth,
   }
 }
 
+
+// 这个函数是真正调用网络来进行预测的，只不过会进行预测模式的判断而已。
+// 还是要借助vs阿。。。看到了调用下面这个函数的三个位置，除去第三个，在解码器中的调用之外，首先是estIntraLumaQT，就是估计亮度通道进行预测的效果。
+// 还有一个地方是xIntraCodingTUBlock，应该是编码时候才会用到的。
 Void TComPrediction::predIntraAng( const ComponentID compID, UInt uiDirMode, Pel* piOrg /* Will be null for decoding */, UInt uiOrgStride, Pel* piPred, UInt uiStride, TComTU &rTu, const Bool bUseFilteredPredSamples, const Bool bUseLosslessDPCM
 #ifdef DEEPRDO 
 , bool useDNN
@@ -482,6 +487,7 @@ Void TComPrediction::predIntraAng( const ComponentID compID, UInt uiDirMode, Pel
             netpredict->inbound->clear();
             int mat_stride = CUSTOM_BLOCK_SIZE;
             for (int i = 0; i < xWidth; i++) {
+              // 注意了，inbound用于存放网络的输入，所以很明显，这里干的事情其实就是对于5PU的预测啦。对应的，下面可以看到的是3PU的预测。
               memcpy(netpredict->inbound->p + xWidth * 3 * i, mm.mats[0]->p + mat_stride * i, sizeof(unsigned short)* xWidth);
               memcpy(netpredict->inbound->p + xWidth + xWidth * 3 * i, mm.mats[1]->p + mat_stride * i, sizeof(unsigned short)* xWidth);
               memcpy(netpredict->inbound->p + xWidth * 2 + xWidth * 3 * i, mm.mats[2]->p + mat_stride * i, sizeof(unsigned short)* xWidth);
@@ -500,6 +506,7 @@ Void TComPrediction::predIntraAng( const ComponentID compID, UInt uiDirMode, Pel
           {
             for (Int x = 0; x < iWidth; x++) // width is always a multiple of 4.
             {
+              // 这里的pDst就是用于存放预测像素的结果的位置。因为outbound就是网络的输出
               pDst[x + uiStride*y] = (*(netpredict->outbound))[y][x];
               if (pDst[x + uiStride*y] >(unsigned short)mm.norm_value)
               {
@@ -560,6 +567,7 @@ Void TComPrediction::predIntraAng( const ComponentID compID, UInt uiDirMode, Pel
 #ifndef FALLTOP
       else
       {
+        // 这里的意思是，如果很不幸的，参考像素都是不可用的，那么我们就会直接使用Planar模式来进行预测。
         mm.cnt ++;
         xPredIntraPlanar(ptrSrc + sw + 1, sw, pDst, uiStride, iWidth, iHeight);
       }
